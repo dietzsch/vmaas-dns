@@ -1,0 +1,61 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.0.7'
+    }
+}
+
+apply plugin: 'base'
+
+
+allprojects {
+    apply plugin: 'maven-publish'
+
+    group = "com.bosch.bpc.vmaas"
+    version = "0.0.1"
+}
+
+subprojects {
+    ext {
+        spockSpringVersion = "2.3-groovy-4.0"
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    if (new File(projectDir, 'src').exists()) {
+        apply plugin: 'java'
+        apply plugin: 'groovy'
+        apply plugin: 'org.springframework.boot'
+        apply plugin: 'io.spring.dependency-management'
+
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(17)
+            }
+        }
+
+        test {
+            useJUnitPlatform()
+        }
+
+        test {
+            reports.html.enabled = false
+
+            testLogging {
+                events "passed", "skipped", "failed"
+            }
+        }
+
+        configurations {
+            [apiElements, runtimeElements].each {
+                it.outgoing.artifacts.removeIf { it.buildDependencies.getDependencies(null).contains(jar) }
+                it.outgoing.artifact(bootJar)
+            }
+        }
+    }
+}

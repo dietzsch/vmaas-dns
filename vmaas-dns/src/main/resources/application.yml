@@ -1,0 +1,29 @@
+management:
+  info:
+    java:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: "info, health, metrics, prometheus"
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+spring:
+  application:
+    name: ${vcap.application.application_name:bhc-vmaas-dns}
+  monitoring:
+    user:
+      name: "monitoring"
+      password: "{noop}password"
+
+server:
+  error:
+    include-message: always
+    whitelabel:
+      enabled: false
